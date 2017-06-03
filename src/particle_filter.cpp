@@ -59,6 +59,16 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		particle.x += (velocity/yaw_rate)*(sin(new_theta)-sin(particle.theta));
 		particle.y += (velocity/yaw_rate)*(cos(particle.theta)-cos(new_theta));;
 		particle.theta = new_theta;
+
+		random_device rd;
+		default_random_engine gen(rd());
+		normal_distribution<> d_x(particle.x,std_pos[0]);
+		normal_distribution<> d_y(particle.y,std_pos[1]);
+		normal_distribution<> d_theta(particle.theta,std_pos[2]);
+
+		particle.x = d_x(gen);
+		particle.y = d_y(gen);
+		particle.theta = d_theta(gen);
 	}
 }
 
