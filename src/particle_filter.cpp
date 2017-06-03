@@ -31,7 +31,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 		particle.id = i;
 
 		random_device rd;
-		mt19937 gen(rd());
+		default_random_engine gen(rd());
 		normal_distribution<> d_x(x,std[0]);
 		normal_distribution<> d_y(y,std[1]);
 		normal_distribution<> d_theta(theta,std[2]);
