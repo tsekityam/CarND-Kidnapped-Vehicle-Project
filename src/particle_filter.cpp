@@ -80,7 +80,7 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 
 	for (auto obs: observations) {
 		double min_dist = INFINITY;
-		for (size_t i = 0; i < predicted; i++) {
+		for (size_t i = 0; i < predicted.size(); i++) {
 			double current_dist = dist(predicted.at(i).x, predicted.at(i).y, obs.x, obs.y);
 			if (current_dist < min_dist) {
 				min_dist = current_dist;
