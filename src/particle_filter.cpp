@@ -56,9 +56,15 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 
 	for (size_t i = 0; i < particles.size(); i++) {
 		double new_theta = particles.at(i).theta + yaw_rate*delta_t;
-		particles.at(i).x += (velocity/yaw_rate)*(sin(new_theta)-sin(particles.at(i).theta));
-		particles.at(i).y += (velocity/yaw_rate)*(cos(particles.at(i).theta)-cos(new_theta));;
-		particles.at(i).theta = new_theta;
+		if (fabs(yaw_rate) < 0.0001) {
+			particles.at(i).x += velocity*delta_t*cos(particles.at(i).theta);
+			particles.at(i).y += velocity*delta_t*sin(particles.at(i).theta);
+		}
+		else {
+			particles.at(i).x += (velocity/yaw_rate)*(sin(new_theta)-sin(particles.at(i).theta));
+			particles.at(i).y += (velocity/yaw_rate)*(cos(particles.at(i).theta)-cos(new_theta));;
+			particles.at(i).theta = new_theta;
+		}
 
 		random_device rd;
 		default_random_engine gen(rd());
