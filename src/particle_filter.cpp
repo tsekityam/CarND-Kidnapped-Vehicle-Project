@@ -108,6 +108,45 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   and the following is a good resource for the actual equation to implement (look at equation
 	//   3.33
 	//   http://planning.cs.uiuc.edu/node99.html
+
+	for (size_t i = 0; i < particles.size(); i++) {
+		std::vector<LandmarkObs> predicted;
+		std::vector<LandmarkObs> transformed_observations;
+
+		for (auto obs: observations) {
+			LandmarkObs transformed_obs;
+			transformed_obs.x = obs.x*cos(particles.at(i).theta)-obs.y*sin(particles.at(i).theta)+particles.at(i).x;
+			transformed_obs.y = obs.x*sin(particles.at(i).theta)+obs.y*cos(particles.at(i).theta)+particles.at(i).y;
+			transformed_observations.push_back(transformed_obs);
+		}
+
+		for (auto landmark: map_landmarks.landmark_list) {
+			if (dist(landmark.x_f, landmark.y_f, particles.at(i).x, particles.at(i).y) < sensor_range) {
+				LandmarkObs obs;
+				obs.id = landmark.id_i;
+				obs.x = landmark.x_f;
+				obs.y = landmark.y_f;
+				predicted.push_back(obs);
+			}
+		}
+
+		dataAssociation(predicted, transformed_observations);
+		particles.at(i).weight = 1;
+
+		for (auto transformed_obs: transformed_observations) {
+			for (auto landmark: predicted) {
+				if (landmark.id == transformed_obs.id) {
+					double delta_x = landmark.x - transformed_obs.x;
+					double delta_y = landmark.y - transformed_obs.y;
+					double exp_value = exp(-(pow(delta_x, 2)/(2*pow(std_landmark[0], 2))+pow(delta_y, 2)/(2*pow(std_landmark[1], 2))));
+					particles.at(i).weight *= 1/(2*M_PI*std_landmark[0]*std_landmark[1])*exp_value;
+					break;
+				}
+			}
+		}
+
+		weights.at(i) = particles.at(i).weight;
+	}
 }
 
 void ParticleFilter::resample() {
