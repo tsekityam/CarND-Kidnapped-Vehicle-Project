@@ -54,21 +54,21 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	//  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
 
-	for (auto particle : particles) {
-		double new_theta = particle.theta + yaw_rate*delta_t;
-		particle.x += (velocity/yaw_rate)*(sin(new_theta)-sin(particle.theta));
-		particle.y += (velocity/yaw_rate)*(cos(particle.theta)-cos(new_theta));;
-		particle.theta = new_theta;
+	for (size_t i = 0; i < particles.size(); i++) {
+		double new_theta = particles.at(i).theta + yaw_rate*delta_t;
+		particles.at(i).x += (velocity/yaw_rate)*(sin(new_theta)-sin(particles.at(i).theta));
+		particles.at(i).y += (velocity/yaw_rate)*(cos(particles.at(i).theta)-cos(new_theta));;
+		particles.at(i).theta = new_theta;
 
 		random_device rd;
 		default_random_engine gen(rd());
-		normal_distribution<> d_x(particle.x,std_pos[0]);
-		normal_distribution<> d_y(particle.y,std_pos[1]);
-		normal_distribution<> d_theta(particle.theta,std_pos[2]);
+		normal_distribution<> d_x(particles.at(i).x,std_pos[0]);
+		normal_distribution<> d_y(particles.at(i).y,std_pos[1]);
+		normal_distribution<> d_theta(particles.at(i).theta,std_pos[2]);
 
-		particle.x = d_x(gen);
-		particle.y = d_y(gen);
-		particle.theta = d_theta(gen);
+		particles.at(i).x = d_x(gen);
+		particles.at(i).y = d_y(gen);
+		particles.at(i).theta = d_theta(gen);
 	}
 }
 
